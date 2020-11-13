@@ -50,7 +50,7 @@ class Image
         if(!in_array($type, array(self::VIEW_THUMBNAIL,self::VIEW_LATERAL,self::VIEW_FRONT))){
             throw new \InvalidArgumentException("Invalid status");
         }
-
+        
         $this->type = $type;
 
         return $this;

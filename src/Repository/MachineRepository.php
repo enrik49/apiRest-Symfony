@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Machine;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @method Machine|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,37 +15,33 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class MachineRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $manager)
     {
         parent::__construct($registry, Machine::class);
+        $this->manager = $manager;
     }
 
-    // /**
-    //  * @return Machine[] Returns an array of Machine objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('m.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+    public function saveMachine($brand, $model, $manufacturer, $price){
+        $newMachine = new Machine();
+        $newMachine
+                ->setBrand($brand)
+                ->setModel($model)
+                ->setManufacturer($manufacturer)
+                ->setPrice($price);
 
-    /*
-    public function findOneBySomeField($value): ?Machine
-    {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $this->manager->persist($newMachine);
+        $this->manager->flush();
     }
-    */
+
+    public function updateMachine(Machine $machine): Machine{
+        $this->manager->persist($machine);
+        $this->manager->flush();
+
+        return $machine;
+    }
+    public function removeMachine(Machine $machine){
+        $this->manager->remove($machine);
+        $this->manager->flush();
+    }
+    
 }
