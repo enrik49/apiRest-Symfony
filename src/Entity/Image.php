@@ -32,6 +32,7 @@ class Image
 
     /**
      * @ORM\ManyToOne(targetEntity=Machine::class, inversedBy="images")
+     * @ORM\JoinColumn(name="machine_id", referencedColumnName="id")
      */
     private $machine;
 
@@ -78,5 +79,14 @@ class Image
         $this->machine = $machine;
 
         return $this;
+    }
+
+    public function setData(){
+        $data = [
+            'id' => $this->getId(),
+            'type' => $this->getType(),
+            'url' => $this->getUrl(),
+        ];
+        return $data;
     }
 }

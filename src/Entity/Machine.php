@@ -40,7 +40,7 @@ class Machine
     private $price;
 
     /**
-     * @ORM\OneToMany(targetEntity=Image::class, mappedBy="machine")
+     * @ORM\OneToMany(targetEntity=Image::class, mappedBy="machine", cascade={"all"})
      */
     private $images;
 

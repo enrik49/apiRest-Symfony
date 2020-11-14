@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 use App\Repository\ImageRepository;
+use App\Repository\MachineRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,9 +18,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class ImageController{
 
     private $imageRepository;
+    private $machineRepository;
 
-    public function __construct(ImageRepository $imageRepository){
+    public function __construct(ImageRepository $imageRepository, MachineRepository $machineRepository){
         $this->imageRepository = $imageRepository;
+        $this->machineRepository = $machineRepository;
     }
 
     /**
@@ -30,12 +33,14 @@ class ImageController{
 
         $url = $data['url'];
         $type = $data['type'];
+        $id_machine = $data['id_machine'];
+        $machine = $this->machineRepository->findOneBy(['id' => $id_machine]);
 
         if(empty($url) || empty($type)) {
             throw new NotFoundHttpException('Expecting..');
         }
-
-        $this->imageRepository->saveImage($type, $url);
+        
+        $image = $this->imageRepository->saveImage($type, $url,$machine);
 
         return new JsonResponse(['status'=> 'Image created'], Response::HTTP_CREATED);
 
@@ -46,7 +51,7 @@ class ImageController{
     public function get($id): JsonResponse
     {
         $image = $this->imageRepository->findOneBy(['id' => $id]);
-        $data = $this->setData($image);
+        $data = $image->setData();
 
         return new JsonResponse($data, Response::HTTP_OK);
     }
@@ -60,7 +65,7 @@ class ImageController{
         $data = [];
 
         foreach ($images as $image) {
-            $data[] = $this->setData($image);
+            $data[] = $image->setData();
         }
 
         return new JsonResponse($data, Response::HTTP_OK);
@@ -77,14 +82,5 @@ class ImageController{
         $this->imageRepository->removeImage($image);
 
         return new JsonResponse(['status' => 'Image deleted'], Response::HTTP_OK);
-    }
-
-    private function setData($image){
-        $data = [
-            'id' => $image->getId(),
-            'type' => $image->getType(),
-            'url' => $image->getUrl(),
-        ];
-        return $data;
     }
 }

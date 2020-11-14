@@ -21,14 +21,17 @@ class ImageRepository extends ServiceEntityRepository
         $this->manager = $manager;
     }
 
-    public function saveImage($type, $url){
+    public function saveImage($type, $url, $machine){
         $newImage = new Image();
         $newImage
                 ->setType($type)
-                ->setUrl($url);
+                ->setUrl($url)
+                ->setMachine($machine);
 
         $this->manager->persist($newImage);
         $this->manager->flush();
+        
+        $machine->addImage($newImage);
     }
 
     public function removeImage(Image $image){

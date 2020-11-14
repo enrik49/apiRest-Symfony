@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 use App\Repository\MachineRepository;
+use App\Repository\ImageRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,9 +18,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class MachineController{
 
     private $machineRepository;
+    private $imageRepository;
 
-    public function __construct(MachineRepository $machineRepository){
+    public function __construct(MachineRepository $machineRepository, ImageRepository $imageRepository){
         $this->machineRepository = $machineRepository;
+        $this->imageRepository = $imageRepository;
     }
 
     /**
@@ -99,13 +102,21 @@ class MachineController{
     }
 
     private function setData($machine){
+        $images = $machine->getImages();
         $data = [
             'id' => $machine->getId(),
             'brand' => $machine->getBrand(),
             'model' => $machine->getModel(),
             'manufacturer' => $machine->getManufacturer(),
             'price' => $machine->getPrice(),
+            'images' => [],
         ];
+        foreach($images as $image){
+            $data['images'][]=$image->setData();
+        }
+        //$images = $machine->getImages();
+        
+        //$data['images'] = findAllById($machine->getId());
         return $data;
     }
 }
